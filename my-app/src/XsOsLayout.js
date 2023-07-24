@@ -1,8 +1,17 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useEffect, useState } from 'react';
 import styles from './XsOsLayout.module.css';
+import { store } from './store';
 
-const XsOsLayout = ({ state, handleClick, xTurn, handleNewGame, playing }) => {
+const XsOsLayout = ({ handleClick, handleNewGame }) => {
+	const [boardArray, setBoardArray] = useState(store.getState().boardArray);
+	const { xTurn, playing } = store.getState();
+
+	useEffect(() => {
+		store.subscribe(() => {
+			setBoardArray(store.getState().boardArray);
+		});
+	});
+
 	const whosTurn = `${xTurn ? 'X' : 'O'}'s turn`;
 	const whosWinner = `${xTurn ? 'O' : 'X'} wins`;
 
@@ -10,7 +19,7 @@ const XsOsLayout = ({ state, handleClick, xTurn, handleNewGame, playing }) => {
 		<>
 			<h1>{playing ? whosTurn : whosWinner}</h1>
 			<div className={styles.board} onClick={handleClick}>
-				{state.map((cellValue, id) => (
+				{boardArray.map((cellValue, id) => (
 					<div className={styles.cells} key={id} data-index={id}>
 						{cellValue}
 					</div>
@@ -21,14 +30,6 @@ const XsOsLayout = ({ state, handleClick, xTurn, handleNewGame, playing }) => {
 			</button>
 		</>
 	);
-};
-
-XsOsLayout.propTypes = {
-	state: PropTypes.array.isRequired,
-	handleClick: PropTypes.func.isRequired,
-	xTurn: PropTypes.bool.isRequired,
-	handleNewGame: PropTypes.func.isRequired,
-	playing: PropTypes.bool.isRequired,
 };
 
 export default XsOsLayout;

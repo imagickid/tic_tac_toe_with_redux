@@ -1,26 +1,27 @@
-import { useState } from 'react';
+import { store } from './store';
 import XsOsLayout from './XsOsLayout';
 
 export const XsOsContainer = () => {
-	const [state, setState] = useState(Array(9).fill(null));
-	const [xTurn, setXTurn] = useState(true);
-	const [playing, setPlaying] = useState(true);
-
 	const handleClick = (e) => {
+		const { boardArray, xTurn, playing } = store.getState();
 		if (playing) {
 			if (e.target.textContent) return;
-			const newState = state.slice();
+			const newState = boardArray.slice();
 			newState[+e.target.dataset.index] = xTurn ? 'X' : 'O';
-			setState(newState);
-			setXTurn(!xTurn);
+
+			store.dispatch({
+				type: 'SET_TIC_TAC_TOE',
+				payload: {
+					boardArray: newState,
+					xTurn: !xTurn,
+				},
+			});
 			checkWinner(newState);
 		}
 	};
 
 	const handleNewGame = () => {
-		setPlaying(true);
-		setState(Array(9).fill(null));
-		setXTurn(true);
+		store.dispatch({ type: 'NEW_GAME' });
 	};
 
 	const winners = [
@@ -35,6 +36,7 @@ export const XsOsContainer = () => {
 	];
 
 	const checkWinner = (currentState) => {
+		const { playing } = store.getState();
 		winners.forEach((winner) => {
 			const [a, b, c] = winner;
 			if (
@@ -42,18 +44,10 @@ export const XsOsContainer = () => {
 				currentState[a] === currentState[b] &&
 				currentState[a] === currentState[c]
 			) {
-				setPlaying(false);
+				store.dispatch({ type: 'GAME_IS_OVER', payload: !playing });
 			}
 		});
 	};
 
-	return (
-		<XsOsLayout
-			state={state}
-			handleClick={handleClick}
-			xTurn={xTurn}
-			handleNewGame={handleNewGame}
-			playing={playing}
-		/>
-	);
+	return <XsOsLayout handleClick={handleClick} handleNewGame={handleNewGame} />;
 };

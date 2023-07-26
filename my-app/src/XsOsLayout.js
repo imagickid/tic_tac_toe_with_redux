@@ -1,16 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { selectBoardArray, selectXTurn, selectPlaying } from './selectors/index';
 import styles from './XsOsLayout.module.css';
-import { store } from './store';
 
 const XsOsLayout = ({ handleClick, handleNewGame }) => {
-	const [boardArray, setBoardArray] = useState(store.getState().boardArray);
-	const { xTurn, playing } = store.getState();
-
-	useEffect(() => {
-		store.subscribe(() => {
-			setBoardArray(store.getState().boardArray);
-		});
-	});
+	const boardArray = useSelector(selectBoardArray);
+	const xTurn = useSelector(selectXTurn);
+	const playing = useSelector(selectPlaying);
 
 	const whosTurn = `${xTurn ? 'X' : 'O'}'s turn`;
 	const whosWinner = `${xTurn ? 'O' : 'X'} wins`;
